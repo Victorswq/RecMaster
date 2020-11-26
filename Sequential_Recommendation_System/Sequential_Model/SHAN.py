@@ -1,5 +1,5 @@
 from Sequential_Model.abstract_model import abstract_model
-from Dataset.abstract_dataset import abstract_dataset
+from Dataset.sequential_abstract_dataset import abstract_dataset
 from Utils.utils import *
 from Utils.evaluate import *
 from Utils.loss_function import *
@@ -174,7 +174,7 @@ class Short_Memory_Attention(nn.Module):
 class Data_for_SHAN(abstract_dataset):
 
     def __init__(self,seq_len=10,data_name="ml-1m",min_user_number=5,min_item_number=5):
-        super(Data_for_SHAN, self).__init__(data_name=data_name,sep="\t")
+        super(Data_for_SHAN, self).__init__(data_name=data_name)
         self.seq_len=seq_len
         self.min_user_number=min_user_number
         self.min_item_number=min_item_number
@@ -279,9 +279,12 @@ class trainer():
                 seq_item=validation[:,:-2]
                 user=validation[:,-1]
                 scores=self.model.prediction([seq_item,user])
-                HitRatio(ratingss=scores.detach().numpy(),pos_items=label,top_k=[10,20])
-                MRR(ratingss=scores.detach().numpy(),pos_items=label,top_k=[10,20])
-                Recall(actual_set,scores.detach().numpy())
+                results=[]
+                results+=HitRatio(ratingss=scores.detach().numpy(),pos_items=label,top_k=[10,20])
+                results+=MRR(ratingss=scores.detach().numpy(),pos_items=label,top_k=[10,20])
+                results+=Recall(actual_set,scores.detach().numpy())
+                for result in results:
+                    self.model.logger.info(result)
 
 
 model=SHAN(data_name="ml-1m",embedding_size=128,learning_rate=0.005)

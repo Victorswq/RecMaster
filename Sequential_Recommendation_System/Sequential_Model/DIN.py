@@ -1,4 +1,4 @@
-from Dataset.abstract_dataset import abstract_dataset
+from Dataset.sequential_abstract_dataset import abstract_dataset
 from Sequential_Model.abstract_model import abstract_model
 from Utils.utils import *
 from Utils.evaluate import *

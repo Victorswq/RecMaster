@@ -1,5 +1,5 @@
 from Sequential_Model.abstract_model import abstract_model
-from Dataset.abstract_dataset import abstract_dataset
+from Dataset.sequential_abstract_dataset import abstract_dataset
 from Utils.evaluate import *
 from Utils.utils import get_batch
 import torch
@@ -287,8 +287,11 @@ class trainer():
                 validation=torch.LongTensor(validation)
                 seq_item=validation[:,:-1]
                 scores=self.model.prediction(seq_item)
-                HitRatio(ratingss=scores.detach().numpy(),pos_items=label,top_k=[20])
-                MRR(ratingss=scores.detach().numpy(),pos_items=label,top_k=[20])
+                results=[]
+                results+=HitRatio(ratingss=scores.detach().numpy(),pos_items=label,top_k=[20])
+                results+=MRR(ratingss=scores.detach().numpy(),pos_items=label,top_k=[20])
+                for result in results:
+                    self.model.logger.info(result)
 
 
 model=STAMP(learning_rate=0.005)

@@ -1,5 +1,5 @@
 from Sequential_Model.abstract_model import abstract_model
-from Dataset.abstract_dataset import abstract_dataset
+from Dataset.sequential_abstract_dataset import abstract_dataset
 from Utils.evaluate import *
 from Utils.utils import *
 
@@ -323,9 +323,12 @@ class trainer():
                 validation=torch.LongTensor(validation)
                 seq_item=validation[:,:-1]
                 scores=self.model.prediction(seq_item)
-                HitRatio(ratingss=scores.detach().numpy(),pos_items=label,top_k=[10,20])
-                MRR(ratingss=scores.detach().numpy(),pos_items=label,top_k=[20])
-                Recall(actual_set, scores.detach().numpy())
+                results=[]
+                results+=HitRatio(ratingss=scores.detach().numpy(),pos_items=label,top_k=[10,20])
+                results+=MRR(ratingss=scores.detach().numpy(),pos_items=label,top_k=[20])
+                results+=Recall(actual_set, scores.detach().numpy())
+                for result in results:
+                    self.model.logger.info(result)
 
 
 model=SASRec(data_name="ml-100k",learning_rate=0.001,seq_len=15,batch_size=128,num_blocks=1)

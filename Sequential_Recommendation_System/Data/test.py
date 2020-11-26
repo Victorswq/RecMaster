@@ -1,8 +1,6 @@
 import pandas as pd
 
 
-data=pd.read_csv("ml-100k.inter",sep="\t")
+data=pd.read_csv("ml-1m.inter",sep=",")
 value=data.values
-
-item=value[:,1]
-print(len(set(item)))
+print(value.shape)

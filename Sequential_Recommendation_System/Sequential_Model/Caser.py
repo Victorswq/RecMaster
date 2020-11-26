@@ -1,4 +1,4 @@
-from Dataset.abstract_dataset import abstract_dataset
+from Dataset.sequential_abstract_dataset import abstract_dataset
 from Sequential_Model.abstract_model import abstract_model
 from Utils.utils import *
 from Utils.evaluate import *
@@ -177,8 +177,8 @@ class Vertical_Screen(nn.Module):
 
 class Data_for_Caser(abstract_dataset):
 
-    def __init__(self,seq_len=10,data_name="ml-100k",min_user_number=0,min_item_number=0):
-        super(Data_for_Caser, self).__init__(data_name=data_name,sep="\t")
+    def __init__(self,seq_len=10,data_name="ml-1m",min_user_number=0,min_item_number=0):
+        super(Data_for_Caser, self).__init__(data_name=data_name)
         self.seq_len=seq_len
         self.min_user_number=min_user_number
         self.min_item_number=min_item_number
@@ -236,7 +236,6 @@ class trainer():
         train_data_value = data
         total_loss=0
         count=1
-        print(len(train_data_value))
         for train_data in get_batch(train_data_value,batch_size=self.model.batch_size):
             """
             train_data: (seq_item,target,user)
@@ -272,9 +271,12 @@ class trainer():
                 seq_item=validation[:,:-2]
                 user=validation[:,-1]
                 scores=self.model.prediction([seq_item,user])
-                HitRatio(ratingss=scores.detach().numpy(),pos_items=label,top_k=[10,20])
-                MRR(ratingss=scores.detach().numpy(),pos_items=label,top_k=[20])
-                Recall(actual_set,scores.detach().numpy())
+                results=[]
+                results+=HitRatio(ratingss=scores.detach().numpy(),pos_items=label,top_k=[10,20])
+                results+=MRR(ratingss=scores.detach().numpy(),pos_items=label,top_k=[20])
+                results+Recall(actual_set,scores.detach().numpy())
+                for result in results:
+                    self.model.logger.info(result)
 
 
 model=Caser(data_name="ml-100k",verbose=1,learning_rate=0.01)

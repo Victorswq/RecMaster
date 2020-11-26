@@ -1,5 +1,5 @@
 from Sequential_Model.abstract_model import abstract_model
-from Dataset.abstract_dataset import abstract_dataset
+from Dataset.sequential_abstract_dataset import abstract_dataset
 from Utils.evaluate import *
 from Utils.utils import *
 
@@ -180,7 +180,7 @@ class Data_for_FPMC(abstract_dataset):
                  min_user_number=5,
                  min_item_number=5,
                  seq_len=10,):
-        super(Data_for_FPMC, self).__init__(data_name=data_name,sep="\t")
+        super(Data_for_FPMC, self).__init__(data_name=data_name)
         self.seq_len=seq_len
         self.min_user_number=min_user_number
         self.min_item_number=min_item_number
@@ -282,8 +282,11 @@ class trainer():
                 last_item=validation[:,:-2]
                 user=validation[:,-1]
                 scores=self.model.prediction([last_item,user])
-                HitRatio(ratingss=scores.detach().numpy(),pos_items=label,top_k=[20])
-                MRR(ratingss=scores.detach().numpy(),pos_items=label,top_k=[20])
+                results=[]
+                results+=HitRatio(ratingss=scores.detach().numpy(),pos_items=label,top_k=[20])
+                results+=MRR(ratingss=scores.detach().numpy(),pos_items=label,top_k=[20])
+                for result in results:
+                    self.model.logger.info(result)
 
 
 model=FPMC(data_name="ml-100k",learning_rate=0.005,seq_len=15)

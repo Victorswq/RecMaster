@@ -3,7 +3,9 @@ from copy import deepcopy
 
 
 def HitRatio(ratingss, pos_items, top_k=[10, 20]):
-    print("rating_shape is ", ratingss.shape, " target shape is ", pos_items.shape)
+    strings=[]
+    string="rating_shape is ", ratingss.shape, " target shape is ", pos_items.shape
+    strings.append(string)
     length = len(ratingss)
     print(length)
     for k in top_k:
@@ -16,12 +18,17 @@ def HitRatio(ratingss, pos_items, top_k=[10, 20]):
                 if rank[index] == pos_items[idx]:
                     hr += 1
                     break
-        print("-------------------------------------------------------HR@%d:  %.3f" % (k, hr / length))
+        string="-------------------------------------------------------HR@%d:  %.3f" % (k, hr / length)
+        strings.append(string)
+
+    return strings
 
 
 
 def MRR(ratingss,pos_items,top_k=[10,20]):
-    print("rating_shape is ", ratingss.shape, " target shape is ", pos_items.shape)
+    strings=[]
+    string="rating_shape is ", ratingss.shape, " target shape is ", pos_items.shape
+    strings.append(string)
     length=len(ratingss)
     for k in top_k:
         ratings=deepcopy(ratingss)
@@ -33,7 +40,10 @@ def MRR(ratingss,pos_items,top_k=[10,20]):
                 if rank[index]==pos_items[idx]:
                     mrr+=1/(k-index)
                     break
-        print("------------------------------------------------------MRR@%d:   %.3f"%(k,mrr/length))
+        string="------------------------------------------------------MRR@%d:   %.3f"%(k,mrr/length)
+        strings.append(string)
+
+    return strings
 
 
 def Recall(pos_items,ratingss,top_k=[10,20]):
@@ -44,7 +54,7 @@ def Recall(pos_items,ratingss,top_k=[10,20]):
     :param top_k:
     :return:
     """
-
+    strings=[]
     for k in top_k:
         sum_recall=0
         num_users=len(ratingss)
@@ -55,4 +65,7 @@ def Recall(pos_items,ratingss,top_k=[10,20]):
             if len(act_set)!=0:
                 sum_recall+=len(act_set&pred_set)/float(len(act_set))
                 true_users+=1
-        print("----------------------------------------------------Recall@%d:   %.3f"%(k,sum_recall/true_users))
+        string="----------------------------------------------------Recall@%d:   %.3f"%(k,sum_recall/true_users)
+        strings.append(string)
+
+    return strings

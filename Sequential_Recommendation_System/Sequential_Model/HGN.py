@@ -1,4 +1,4 @@
-from Dataset.abstract_dataset import abstract_dataset
+from Dataset.sequential_abstract_dataset import abstract_dataset
 from Utils.evaluate import *
 from Utils.loss_function import *
 from Utils.utils import *
@@ -282,9 +282,12 @@ class trainer():
                 seq_item=validation[:,:-2]
                 user=validation[:,-1]
                 scores=self.model.prediction([seq_item,user])
-                HitRatio(ratingss=scores.detach().numpy(),pos_items=label,top_k=[10,20])
-                MRR(ratingss=scores.detach().numpy(),pos_items=label,top_k=[10,20])
+                results=[]
+                results+=HitRatio(ratingss=scores.detach().numpy(),pos_items=label,top_k=[10,20])
+                results+=MRR(ratingss=scores.detach().numpy(),pos_items=label,top_k=[10,20])
                 Recall(actual_set,scores.detach().numpy())
+                for result in results:
+                    self.model.logger.info(result)
 
 
 model=HGN(data_name="ml-100k",learning_rate=0.001,seq_len=5)

@@ -1,4 +1,4 @@
-from Dataset.abstract_dataset import abstract_dataset
+from Dataset.sequential_abstract_dataset import abstract_dataset
 from Sequential_Model.abstract_model import abstract_model
 from Utils.utils import *
 from Utils.evaluate import *
@@ -161,7 +161,7 @@ class Similarity(nn.Module):
 class Data_for_Fossil(abstract_dataset):
 
     def __init__(self,data_name="ml-100k",seq_len=10,min_user_number=5,min_item_number=5):
-        super(Data_for_Fossil, self).__init__(data_name=data_name,sep="\t")
+        super(Data_for_Fossil, self).__init__(data_name=data_name)
         self.seq_len=seq_len
 
         self.min_user_number=min_user_number
@@ -269,10 +269,13 @@ class trainer():
                 seq_item=validation[:,:-2]
                 data_len=validation[:,-1]
                 scores=self.model.prediction([seq_item,data_len])
-                HitRatio(ratingss=scores.detach().numpy(),pos_items=label,top_k=[20])
-                MRR(ratingss=scores.detach().numpy(),pos_items=label,top_k=[20])
+                results=[]
+                results+=HitRatio(ratingss=scores.detach().numpy(),pos_items=label,top_k=[20])
+                results+=MRR(ratingss=scores.detach().numpy(),pos_items=label,top_k=[20])
+                for result in results:
+                    self.model.logger.info(result)
 
 
-model=Fossil(order=2,seq_len=10)
+model=Fossil(order=2,seq_len=10,data_name="ml-1m")
 trainer=trainer(model)
 trainer.train()

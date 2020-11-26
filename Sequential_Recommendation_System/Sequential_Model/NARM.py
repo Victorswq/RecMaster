@@ -3,7 +3,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from Sequential_Model.abstract_model import abstract_model
-from Dataset.abstract_dataset import abstract_dataset
+from Dataset.sequential_abstract_dataset import abstract_dataset
 from Utils.evaluate import HitRatio,MRR
 from Utils.utils import get_batch
 from torch.nn.init import xavier_normal_,constant_
@@ -186,7 +186,6 @@ class Data_for_NARM(abstract_dataset):
         test_index=0
 
         data_values=self.data.values
-        print("the leanth is ",len(data_values))
         for idx,value in enumerate(data_values):
             time=value[3]
             if time>valid_time:
@@ -275,8 +274,11 @@ class trainer():
                 validation=torch.LongTensor(validation)
                 seq_item=validation[:,:-1]
                 scores=self.model.prediction(seq_item)
-                HitRatio(ratingss=scores.detach().numpy(),pos_items=label,top_k=[20])
-                MRR(ratingss=scores.detach().numpy(),pos_items=label,top_k=[20])
+                results=[]
+                results+=HitRatio(ratingss=scores.detach().numpy(),pos_items=label,top_k=[20])
+                results+=RR(ratingss=scores.detach().numpy(),pos_items=label,top_k=[20])
+                for result in results:
+                    self.model.logger.info(result)
 
 
 model=NARM(learning_rate=0.001)

@@ -1,13 +1,12 @@
 from Sequential_Model.abstract_model import abstract_model
-from Dataset.abstract_dataset import abstract_dataset
+from Dataset.sequential_abstract_dataset import abstract_dataset
 from Utils.loss_function import BPRLoss
 from Utils.utils import get_batch
-from Utils.evaluate import HitRatio
+from Utils.evaluate import HitRatio,MRR
 
 import torch
 import torch.nn as nn
 import torch.optim as optim
-import numpy as np
 
 
 class TransRec(abstract_model):
@@ -109,8 +108,7 @@ class Data_for_TransRec(abstract_dataset):
                  one=1,
                  seq_len=10,
                  neg_number=1,):
-        super(Data_for_TransRec, self).__init__(data_name=data_name,
-                                                sep="\t")
+        super(Data_for_TransRec, self).__init__(data_name=data_name)
         self.data_name=data_name
         self.min_user_number=min_user_number
         self.min_item_number=min_item_number
@@ -177,8 +175,11 @@ class trainer():
                 last_item = validation[:, 0]
                 user_id=validation[:,2]
                 scores=self.model.prediction([last_item,user_id])
-                HitRatio(ratingss=scores.detach().numpy(),pos_items=label,top_k=[10,20])
-                # MRR(ratingss=scores.detach().numpy(),pos_items=label,top_k=[10,20])
+                results=[]
+                results+=HitRatio(ratingss=scores.detach().numpy(),pos_items=label,top_k=[10,20])
+                results+=MRR(ratingss=scores.detach().numpy(),pos_items=label,top_k=[10,20])
+                for result in results:
+                    self.model.logger.info(result)
 
 
 model=TransRec(learning_rate=0.001,data_name="ml-100k")

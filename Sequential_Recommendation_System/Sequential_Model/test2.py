@@ -1,3 +1,9 @@
-import torch
+import numpy as np
 
-print(torch.triu(torch.ones(5,5),diagonal=1))
+
+a=np.array(np.random.randint(low=1,high=5,size=(3,4)))
+print(a)
+
+for x in a:
+    x[0]=-111
+print(a)
